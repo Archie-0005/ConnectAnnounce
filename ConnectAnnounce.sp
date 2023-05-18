@@ -11,7 +11,7 @@ ConVar h_admintagmsg;
 public Plugin myinfo = 
 {
 	name = "Connect Announce Manager", 
-	author = "Archie", 
+	author = "Archie, Nagahi", 
 	description = "Player connect announce management", 
 	version = "1.0", 
 	url = ""
