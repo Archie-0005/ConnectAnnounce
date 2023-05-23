@@ -11,7 +11,7 @@ public Plugin myinfo = {
 	author = "Archie",
 	description = "Simple connect announce management",
 	version = "1.0",
-	url = ""
+	url = "https://sourcemod.net/"
 }
 
 public void OnClientPostAdminCheck(int client)
@@ -26,7 +26,6 @@ public void OnClientPostAdminCheck(int client)
 	GetClientAuthId(client, AuthId_Steam2, sAuth, sizeof(sAuth));
 
 	if(CheckCommandAccess(client, "Admin_connect", ADMFLAG_GENERIC, true))
-
 	{
 		if(GetClientIP(client, sIP, sizeof(sIP)) && GeoipCountry(sIP, sCountry, sizeof(sCountry)))
 			CPrintToChatAll("{cyan}Admin {green}%N [{lightgreen}%s{green}] connected from {lightgreen)%s{green}.", client, sAuth, sCountry);
@@ -34,7 +33,6 @@ public void OnClientPostAdminCheck(int client)
 			CPrintToChatAll("{cyan}Admin {green}%N [{lightgreen}%s{green}] connected{green}.", client, sAuth);
 	}
 	if(CheckCommandAccess(client, "Vip_connect", ADMFLAG_CUSTOM1, true))
-
 	{
 		if(GetClientIP(client, sIP, sizeof(sIP)) && GeoipCountry(sIP, sCountry, sizeof(sCountry)))
 			CPrintToChatAll("{cyan}VIP {green}%N [{lightgreen}%s{green}] connected from {lightgreen)%s{green}.", client, sAuth, sCountry);
