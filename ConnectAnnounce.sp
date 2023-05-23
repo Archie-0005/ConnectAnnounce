@@ -1,72 +1,51 @@
+#pragma semicolon 1
+
 #include <sourcemod>
 #include <geoip>
 #include <multicolors>
 
 #pragma newdecls required
 
-ConVar h_connectmsg;
-ConVar h_countrymsg;
-ConVar h_admintagmsg;
-
-public Plugin myinfo = 
-{
-	name = "Connect Announce Manager", 
-	author = "Archie, Nagahi", 
-	description = "Player connect announce management", 
-	version = "1.0", 
+public Plugin myinfo = {
+	name = "Connect Announce",
+	author = "Archie",
+	description = "Simple connect announce management",
+	version = "1.0",
 	url = ""
-}
-
-public void OnPluginStart()
-{
-	h_connectmsg = CreateConVar("sm_connectmsg", "1", "Shows connecting messages", FCVAR_DONTRECORD, true, 0.0, true, 1.0);
-	h_countrymsg = CreateConVar("sm_countrymsg", "1", "Shows the country  messages", FCVAR_DONTRECORD, true, 0.0, true, 1.0);
-	h_admintagmsg = CreateConVar("sm_admintagmsg", "1", "Shows admin/vip messages", FCVAR_DONTRECORD, true, 0.0, true, 1.0);
 }
 
 public void OnClientPostAdminCheck(int client)
 {
-	if (h_connectmsg.BoolValue)
+	if(IsFakeClient(client))
+		return;
+
+	static char sAuth[32];
+	static char sIP[16];
+	static char sCountry[32];
+
+	GetClientAuthId(client, AuthId_Steam2, sAuth, sizeof(sAuth));
+
+	if(CheckCommandAccess(client, "Admin_connect", ADMFLAG_GENERIC, true))
+
 	{
-		char authid[64], IP[16], Country[46];
-		GetClientAuthId(client, AuthId_Steam2, authid, sizeof(authid));
-		
-		GetClientIP(client, IP, sizeof(IP), true);
-		
-		if(GetClientIP(client, IP, sizeof(IP)) && GeoipCountry(IP, Country, sizeof(Country)))
-		
-		{
-			if (h_admintagmsg.IntValue == 1)
-			{
-				if (IsPlayerGenericAdmin(client))
-				{
-					if (h_countrymsg.IntValue == 1)
-					CPrintToChatAll("{white}Admin {green}%N [{lightgreen}%s{green}] connected from %s.", client, authid, Country);
-					else CPrintToChatAll("{white}Admin %N {green}[{lightgreen}%s{green}] connected.", client, authid);
-				}
-				else if (IsPlayerCustom1Admin(client))
-				{
-					if (h_countrymsg.IntValue == 1)
-					CPrintToChatAll("{white}VIP {green}%N [{lightgreen}%s{green}] connected from %s.", client, authid, Country);
-					else CPrintToChatAll("{white}VIP {green}%N [{lightgreen}%s{green}] connected.", client, authid);
-				}
-				else
-				{
-					if (h_countrymsg.IntValue == 1)
-					CPrintToChatAll("{white}Player {green}%N [{lightgreen}%s{green}] connected from %s.", client, authid, Country);
-					else CPrintToChatAll("{white}Player {green}%N [{lightgreen}%s{green}] connected.", client, authid);
-				}
-			}
-		}
+		if(GetClientIP(client, sIP, sizeof(sIP)) && GeoipCountry(sIP, sCountry, sizeof(sCountry)))
+			CPrintToChatAll("{cyan}Admin {green}%N [{lightgreen}%s{green}] connected from {lightgreen)%s{green}.", client, sAuth, sCountry);
+		else	
+			CPrintToChatAll("{cyan}Admin {green}%N [{lightgreen}%s{green}] connected{green}.", client, sAuth);
+	}
+	if(CheckCommandAccess(client, "Vip_connect", ADMFLAG_CUSTOM1, true))
+
+	{
+		if(GetClientIP(client, sIP, sizeof(sIP)) && GeoipCountry(sIP, sCountry, sizeof(sCountry)))
+			CPrintToChatAll("{cyan}VIP {green}%N [{lightgreen}%s{green}] connected from {lightgreen)%s{green}.", client, sAuth, sCountry);
+		else	
+			CPrintToChatAll("{cyan}VIP {green}%N [{lightgreen}%s{green}] connected{green}.", client, sAuth);
+	}
+	else
+	{
+		if(GetClientIP(client, sIP, sizeof(sIP)) && GeoipCountry(sIP, sCountry, sizeof(sCountry)))
+			CPrintToChatAll("{cyan}Player {green}%N [{lightgreen}%s{green}] connected from {lightgreen)%s{green}.", client, sAuth, sCountry);
+		else	
+			CPrintToChatAll("{cyan}Player {green}%N [{lightgreen}%s{green}] connected{green}.", client, sAuth);
 	}
 }
-
-bool IsPlayerGenericAdmin(int client)
-{
-	return ((GetUserFlagBits(client) & ADMFLAG_GENERIC) > 0);
-}
-
-bool IsPlayerCustom1Admin(int client)
-{
-	return ((GetUserFlagBits(client) & ADMFLAG_CUSTOM1) > 0);
-} 
