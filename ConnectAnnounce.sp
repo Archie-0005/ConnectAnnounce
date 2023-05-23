@@ -2,7 +2,6 @@
 
 #include <sourcemod>
 #include <geoip>
-#include <multicolors>
 
 #pragma newdecls required
 
@@ -28,22 +27,38 @@ public void OnClientPostAdminCheck(int client)
 	if(CheckCommandAccess(client, "Admin_connect", ADMFLAG_GENERIC, true))
 	{
 		if(GetClientIP(client, sIP, sizeof(sIP)) && GeoipCountry(sIP, sCountry, sizeof(sCountry)))
-			CPrintToChatAll("{cyan}Admin {green}%N [{lightgreen}%s{green}] connected from {lightgreen)%s{green}.", client, sAuth, sCountry);
+			PrintToChatAll("\x07FFFFFFAdmin \x04%N [\x03%s\x04] connected from \x03%s\x04.", client, sAuth, sCountry);
 		else	
-			CPrintToChatAll("{cyan}Admin {green}%N [{lightgreen}%s{green}] connected{green}.", client, sAuth);
+			PrintToChatAll("\x07FFFFFFAdmin \x04%N [\x03%s\x04] connected\x04.", client, sAuth);
 	}
-	if(CheckCommandAccess(client, "Vip_connect", ADMFLAG_CUSTOM1, true))
+	else if(CheckCommandAccess(client, "Vip_connect", ADMFLAG_CUSTOM1, true))
 	{
 		if(GetClientIP(client, sIP, sizeof(sIP)) && GeoipCountry(sIP, sCountry, sizeof(sCountry)))
-			CPrintToChatAll("{cyan}VIP {green}%N [{lightgreen}%s{green}] connected from {lightgreen)%s{green}.", client, sAuth, sCountry);
+			PrintToChatAll("\x07FFFFFFVIP \x04%N [\x03%s\x04] connected from \x03%s\x04.", client, sAuth, sCountry);
 		else	
-			CPrintToChatAll("{cyan}VIP {green}%N [{lightgreen}%s{green}] connected{green}.", client, sAuth);
+			PrintToChatAll("\x07FFFFFFVIP \x04%N [\x03%s\x04] connected\x04.", client, sAuth);
 	}
 	else
 	{
 		if(GetClientIP(client, sIP, sizeof(sIP)) && GeoipCountry(sIP, sCountry, sizeof(sCountry)))
-			CPrintToChatAll("{cyan}Player {green}%N [{lightgreen}%s{green}] connected from {lightgreen)%s{green}.", client, sAuth, sCountry);
+			PrintToChatAll("\x07FFFFFFPlayer \x04%N [\x03%s\x04] connected from \x03%s\x04.", client, sAuth, sCountry);
 		else	
-			CPrintToChatAll("{cyan}Player {green}%N [{lightgreen}%s{green}] connected{green}.", client, sAuth);
+			PrintToChatAll("\x07FFFFFFPlayer \x04%N [\x03%s\x04] connected\x04.", client, sAuth);
 	}
+}
+
+stock void Custom_PrintToChatAll(const char[] format, any ...) {
+    Handle handle = StartMessageAll("SayText2");
+
+    if (handle == null) return;
+    if (GetUserMessageType() == UM_Protobuf) return;
+
+    BfWrite bfWrite = UserMessageToBfWrite(handle);
+
+    char buffer[512];
+    VFormat(buffer, sizeof(buffer), format, 2);
+
+    bfWrite.WriteByte(0);
+    bfWrite.WriteByte(true);
+    bfWrite.WriteString(buffer);
 }
