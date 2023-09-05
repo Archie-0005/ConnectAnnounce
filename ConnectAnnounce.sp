@@ -5,7 +5,8 @@
 
 #pragma newdecls required
 
-public Plugin myinfo = {
+public Plugin myinfo =
+{
 	name = "Connect Announce",
 	author = "Archie",
 	description = "Simple connect announce management",
